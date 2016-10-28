@@ -23,6 +23,8 @@ def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
     prices = prices_all[syms]  # only portfolio symbols
     prices_SPY = prices_all['SPY']  # only SPY, for comparison later
 
+    cr, adr, sddr, sr = [0.25, 0.001, 0.0005, 2.1] # add code here to compute stats
+
     print prices
     normed = prices.values / prices.values[0]
     print normed
@@ -39,8 +41,17 @@ def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
     port_val = pos_vals.sum(axis=1)
     print port_val
 
+    daily_returns = port_val.copy()
+    daily_returns[1:] = (daily_returns[1:] / daily_returns[:-1]) - 1
+    daily_returns[0] = 0
+    print daily_returns
+
+    cr = (port_val[-1] / port_val[0]) - 1
+    adr = daily_returns.mean()
+    sddr = daily_returns.std()
+    sr = adr / sddr
     # Get portfolio statistics (note: std_daily_ret = volatility)
-    cr, adr, sddr, sr = [0.25, 0.001, 0.0005, 2.1] # add code here to compute stats
+
 
     # Compare daily portfolio value with SPY using a normalized plot
     if gen_plot:
