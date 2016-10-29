@@ -14,37 +14,32 @@ def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
     sv=1000000, rfr=0.0, sf=252.0, \
     gen_plot=False):
 
-    allocs=[0.1,0.2,0.3,0.4]
-    print allocs
-
     # Read in adjusted closing prices for given symbols, date range
     dates = pd.date_range(sd, ed)
     prices_all = get_data(syms, dates)  # automatically adds SPY
     prices = prices_all[syms]  # only portfolio symbols
     prices_SPY = prices_all['SPY']  # only SPY, for comparison later
 
-    cr, adr, sddr, sr = [0.25, 0.001, 0.0005, 2.1] # add code here to compute stats
 
-    print prices
-    normed = prices.values / prices.values[0]
-    print normed
 
-    print allocs
+    #print prices
+    normed = prices / prices.ix[0,:]
+    #print normed
+
+    #print allocs
 
     alloced = normed * allocs
-    print alloced
+    #print alloced
 
     pos_vals = alloced * sv
-    print pos_vals
+    #print pos_vals
 
     # Get daily portfolio value
     port_val = pos_vals.sum(axis=1)
-    print port_val
+    #print port_val
 
-    daily_returns = port_val.copy()
-    daily_returns[1:] = (daily_returns[1:] / daily_returns[:-1]) - 1
-    daily_returns[0] = 0
-    print daily_returns
+    daily_returns = (port_val[1:].values / port_val[:-1].values) - 1
+    #print daily_returns
 
     cr = (port_val[-1] / port_val[0]) - 1
     adr = daily_returns.mean()
@@ -52,11 +47,17 @@ def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
     sr = adr / sddr
     # Get portfolio statistics (note: std_daily_ret = volatility)
 
+    #print port_val
+    #print prices_SPY
 
     # Compare daily portfolio value with SPY using a normalized plot
     if gen_plot:
         # add code to plot here
         df_temp = pd.concat([port_val, prices_SPY], keys=['Portfolio', 'SPY'], axis=1)
+        df_temp_normed = df_temp / df_temp.ix[0,:]
+        #print "df_temp: ", df_temp_normed
+        df_temp_normed.plot()
+        plt.show()
         pass
 
     # Add code here to properly compute end value
@@ -84,7 +85,7 @@ def test_code():
         syms = symbols, \
         allocs = allocations,\
         sv = start_val, \
-        gen_plot = False)
+        gen_plot = True)
 
     # Print statistics
     print "Start Date:", start_date
