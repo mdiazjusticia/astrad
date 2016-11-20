@@ -3,6 +3,7 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import math
 
 def symbol_to_path(symbol, base_dir="C:/data_stock/"):
     """Return CSV file path given ticker symbol."""
@@ -31,3 +32,9 @@ def plot_data(df, title="Stock prices", xlabel="Date", ylabel="Price"):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     plt.show()
+
+def euclideanDistance(instance1, instance2, length):
+    distance = 0
+    for x in range(length):
+        distance += pow((instance1[x] - instance2[x]), 2)
+    return math.sqrt(distance)
