@@ -1,4 +1,5 @@
 import KNNLearner as knn
+import numpy as np
 
 class BagLearner(object):
 
@@ -17,13 +18,14 @@ class BagLearner(object):
         @param dataY: the Y training values
         """
         # build and save the model
-        learner2 = knn.KNNLearner(k=3, verbose=True)  # create a KNNLearner
-        learner2.addEvidence(dataX, dataY)
+        #learner2 = knn.KNNLearner(k=3, verbose=True)  # create a KNNLearner
 
         #self.learner.addEvidence(dataX, dataY)
-        learners = [learner2]
-        #for i in range(0, self.bags):
-        #    learners.append(self.learner(**self.kwargs))
+        learners = []
+        for i in range(0, self.bags):
+            learner = self.learner(**self.kwargs)
+            learner.addEvidence(dataX, dataY)
+            learners.append(learner)
         self.learners = learners
 
     def query(self,points):
@@ -32,9 +34,10 @@ class BagLearner(object):
         @param points: should be a numpy array with each row corresponding to a specific query.
         @returns the estimated values according to the saved model.
         """
-        learner = self.learners[0]
+        predictions = np.matrix()
+        for learner in self.learners:
+            predictions.append(learner.query(points))
 
-        predictions = learner.query(points)
         return predictions
 
 if __name__=="__main__":
