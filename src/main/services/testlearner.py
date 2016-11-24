@@ -6,6 +6,7 @@ import numpy as np
 import math
 import LinRegLearner as lrl
 import KNNLearner as knn
+import BagLearner as bag
 
 if __name__=="__main__":
     inf = open('Data/ripple.csv')
@@ -32,6 +33,7 @@ if __name__=="__main__":
     # evaluate in sample
     predY = learner.query(trainX) # get the predictions
     rmse = math.sqrt(((trainY - predY) ** 2).sum()/trainY.shape[0]) #residual error
+    print "Linear regression learner"
     print
     print "In sample results"
     print "RMSE: ", rmse
@@ -48,12 +50,13 @@ if __name__=="__main__":
     print "corr: ", c[0,1]
 
     # create a learner and train it
-    learner2 = knn.KNNLearner(k = 4, verbose = True) # create a LinRegLearner
+    learner2 = knn.KNNLearner(k = 3, verbose = True) # create a KNNLearner
     learner2.addEvidence(trainX, trainY) # train it
 
     # evaluate in sample
     predY = learner2.query(trainX) # get the predictions
     rmse = math.sqrt(((trainY - predY) ** 2).sum()/trainY.shape[0]) #residual error
+    print "KNN learner"
     print
     print "In sample results"
     print "RMSE: ", rmse
@@ -68,6 +71,29 @@ if __name__=="__main__":
     print "RMSE: ", rmse
     c = np.corrcoef(predY, y=testY)
     print "corr: ", c[0,1]
+
+    # create a learner and train it
+    learner3 = bag.BagLearner(learner = knn.KNNLearner, kwargs = {"k":3}, bags = 20, boost = False, verbose = False)
+    learner3.addEvidence(trainX, trainY)  # train it
+
+    # evaluate in sample
+    predY = learner3.query(trainX)  # get the predictions
+    rmse = math.sqrt(((trainY - predY) ** 2).sum() / trainY.shape[0])  # residual error
+    print "Bag learner"
+    print
+    print "In sample results"
+    print "RMSE: ", rmse
+    c = np.corrcoef(predY, y=trainY)
+    print "corr: ", c[0, 1]
+
+    # evaluate out of sample
+    predY = learner2.query(testX)  # get the predictions
+    rmse = math.sqrt(((testY - predY) ** 2).sum() / testY.shape[0])
+    print
+    print "Out of sample results"
+    print "RMSE: ", rmse
+    c = np.corrcoef(predY, y=testY)
+    print "corr: ", c[0, 1]
 
 
     #learners = []
