@@ -24,7 +24,11 @@ class BagLearner(object):
         learners = []
         for i in range(0, self.bags):
             learner = self.learner(**self.kwargs)
-            learner.addEvidence(dataX, dataY)
+            num_samples = len(dataX)
+            a = np.random.random_integers(0, num_samples-1, int(0.6*num_samples))
+            trainX = dataX[a]
+            trainY = dataY[a]
+            learner.addEvidence(trainX, trainY)
             learners.append(learner)
         self.learners = learners
 
@@ -34,11 +38,21 @@ class BagLearner(object):
         @param points: should be a numpy array with each row corresponding to a specific query.
         @returns the estimated values according to the saved model.
         """
-        predictions = np.matrix()
-        for learner in self.learners:
-            predictions.append(learner.query(points))
+        print len(points)
+        predictions = np.zeros(shape=(600, 1))
+        print predictions.shape
 
-        return predictions
+
+        for learner in self.learners:
+            p = learner.query(points)
+            #predictions = np.append(predictions, p, axis=1)
+            predictions = np.c_[predictions, p]
+            print predictions.shape
+
+        s = predictions.sum(axis=1)
+        result = s / self.bags
+
+        return result
 
 if __name__=="__main__":
-    print "the secret clue is 'zzyzx'"
+    print "the secret clue is 'zzyzx'" "the secret clue is 'zzyzx'"
